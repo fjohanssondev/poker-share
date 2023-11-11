@@ -10,4 +10,14 @@ export const gameRouter = createTRPCRouter({
       where: { createdBy: { id: ctx.session.user.id } },
     });
   }),
+
+  create: protectedProcedure.input(z.object({ buyIn: z.number(), initialStack: z.number() })).mutation(({ ctx, input }) => {
+    return ctx.db.game.create({
+      data: {
+        buyIn: input.buyIn,
+        initialStack: input.initialStack,
+        createdBy: { connect: { id: ctx.session.user.id } },
+      },
+    });
+  }),
 });
