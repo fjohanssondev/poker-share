@@ -30,8 +30,8 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`font-sans ${inter.variable} bg-primary min-h-screen text-white`}>
         <TRPCReactProvider cookies={cookies().toString()}>
-          <header className="flex p-8">
-            <div className="flex items-center justify-end gap-4 container px-8 mx-auto">
+          <header className="flex py-4 md:p-8">
+            <div className="flex items-center justify-between md:justify-end gap-4 container px-8 mx-auto">
               <p className="text-white">
                 {session && <span>Logged in as <strong>{session.user?.name}</strong></span>}
               </p>
@@ -43,7 +43,7 @@ export default async function RootLayout({
               </Link>
             </div>
           </header>
-          <main className="container flex flex-col px-8 mx-auto py-16">
+          <main className="container flex flex-col px-8 mx-auto md:py-16">
             {children}
           </main>
         </TRPCReactProvider>
