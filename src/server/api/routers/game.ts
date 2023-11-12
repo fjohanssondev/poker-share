@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const gameRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
@@ -16,6 +13,7 @@ export const gameRouter = createTRPCRouter({
       data: {
         buyIn: input.buyIn,
         initialStack: input.initialStack,
+        participants: {},
         createdBy: { connect: { id: ctx.session.user.id } },
       },
     });
