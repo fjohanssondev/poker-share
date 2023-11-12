@@ -16,6 +16,7 @@ model Game {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   isFinished   Boolean  @default(false)
+  timer        Int
   buyIn        Int
   initialStack Int
   createdBy    User     @relation(fields: [createdById], references: [id])
