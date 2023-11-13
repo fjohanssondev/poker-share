@@ -1,6 +1,6 @@
 "use client"
 
-import { set, z } from "zod";
+import { z } from "zod";
 import type { Session, User } from "next-auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation"
@@ -27,8 +27,8 @@ export function GameForm({ session }: GameFormProps) {
   const [initialStack, setInitialStack] = useState(0);
 
   const createGame = api.game.create.useMutation({
-    onSuccess: () => {
-      router.replace("/game:id");
+    onSuccess: (data) => {
+      router.replace(`/game/${data.id}`);
     },
   });
 
@@ -61,40 +61,54 @@ export function GameForm({ session }: GameFormProps) {
     <form
       onSubmit={(e) => {
         e.preventDefault();
+
+        const parsedBuyIn = z.number().parse(buyIn);
+        const parsedInitialStack = z.number().parse(initialStack);
+
+        const participantsData = players.map(player => ({
+          name: player.name ?? "",
+          isRegisteredUser: !!player.id,
+          userId: player.id || undefined,
+        }));
+
         createGame.mutate({
-          buyIn: z.number().parse(buyIn),
-          initialStack: z.number().parse(initialStack),
-          participants: players.map(player => player.id),
+          buyIn: parsedBuyIn,
+          initialStack: parsedInitialStack,
+          participants: participantsData,
         });
       }}
       className="flex flex-col items-start"
     >
-      <div className="flex flex-col mt-6 gap-1 w-full lg:w-1/3">
+      <div className="flex flex-col mt-6 gap-1 w-full lg:w-2/3">
         <label htmlFor="buy-in">Buy in</label>
         <input value={buyIn} onChange={(e) => setBuyIn(Number(e.target.value))} required min={1} className="rounded-sm bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" id="buy-in" type="number" placeholder="What's the buy in?" />
       </div>
-      <div className="flex flex-col mt-6 gap-1 w-full lg:w-1/3">
+      <div className="flex flex-col mt-6 gap-1 w-full lg:w-2/3">
         <label htmlFor="initial-stack">Initial stack</label>
         <input value={initialStack} onChange={(e) => setInitialStack(Number(e.target.value))} required min={1} className="rounded-sm bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" id="initial-stack" type="number" placeholder="How much does each player start with in value?" />
       </div>
-      <div className="flex flex-col mt-6 gap-1 w-full lg:w-1/3">
+      <div className="flex flex-col mt-6 gap-1 w-full lg:w-2/3">
         <label htmlFor="player">Add players</label>
         <input onChange={handleSearchPlayer} value={name} className="rounded-sm bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" id="player" type="search" placeholder="Search for a player" />
         {listOfPlayers && (
-          <div className="mt-2 p-3 rounded-sm bg-white/5">
-            {listOfPlayers?.map((player) => (
-              <div key={player.id} className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-3">
-                  <Image width={40} height={40} className="rounded-full border-2 border-white/70" src={player.image ?? ""} alt={player.name ?? ""} />
-                  <span className="font-medium">{player.name}</span>
-                </div>
-                <button onClick={(e) => handleAddPlayer(e, player)} className="rounded-full bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20">Add</button>
+          <>
+            {listOfPlayers?.length > 0 && (
+              <div className="mt-2 p-3 rounded-sm bg-white/5">
+                {listOfPlayers?.map((player) => (
+                  <div key={player.id} className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <Image width={40} height={40} className="rounded-full border-2 border-white/70" src={player.image ?? ""} alt={player.name ?? ""} />
+                      <span className="font-medium">{player.name}</span>
+                    </div>
+                    <button onClick={(e) => handleAddPlayer(e, player)} className="rounded-full bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20">Add</button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
-      <div className="flex flex-col mt-6 gap-1 w-full lg:w-1/3 rounded-sm bg-white/10 p-4">
+      <div className="flex flex-col mt-6 gap-1 w-full lg:w-2/3 rounded-sm bg-white/10 p-4">
         <span>Playerlist</span>
         <div className="flex flex-col gap-4 mt-4">
           {players.map((player) => (
@@ -108,7 +122,7 @@ export function GameForm({ session }: GameFormProps) {
           ))}
         </div>
       </div>
-      <button className="rounded-sm w-full lg:w-1/3 mt-8 bg-secondary outline-offset-2 text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-secondary/80" type="submit">
+      <button className="rounded-sm w-full lg:w-2/3 mt-8 bg-secondary outline-offset-2 text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-secondary/80" type="submit">
         Create game
       </button>
     </form>
