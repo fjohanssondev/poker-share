@@ -19,6 +19,27 @@ export const gameRouter = createTRPCRouter({
     });
   }),
 
+  getGameInfo: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const game = await ctx.db.game.findUnique({
+      where: {
+        id: input,
+      },
+      include: {
+        participants: true,
+        createdBy: true,
+      },
+    });
+
+    if (!game) return null;
+
+    const isParticipant = game.participants.some(p => p.id === ctx.session.user.id);
+    const isCreator = game.createdById === ctx.session.user.id;
+
+    if (!isParticipant && !isCreator) return null;
+
+    return game;
+  }),
+
   create: protectedProcedure.input(z.object({
     buyIn: z.number(),
     initialStack: z.number(),
