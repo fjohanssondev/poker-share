@@ -12,6 +12,8 @@ export interface Game {
   timer: number;
   buyIn: number;
   initialStack: number;
+  startTime: Date;
+  endTime: Date;
   createdBy: string;
   createdById: string;
 }
@@ -25,7 +27,7 @@ export default function Games() {
 
   return (
     <>
-      <input onChange={(e) => setSearchQuery(e.target.value)} type="search" value={searchQuery} placeholder="Filter your games based on date" className="flex w-full text-center rounded-full bg-white/10 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" />
+      <input onChange={(e) => setSearchQuery(e.target.value)} type="search" value={searchQuery} placeholder="Filter your games based on date" className="flex w-full outline-offset-2 text-center rounded-full bg-white/10 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" />
       {isLoading ? (
         <div>Loading...</div>
       ) : (
@@ -43,7 +45,7 @@ function GameList({ games }: { games: Game[] }) {
       <div className="grid md:grid-cols-2 lg:grid-cols-auto gap-4">
         {games.map(({ id, createdAt }) => (
           <Link key={id} href={`/game/${id}`}>
-            <article className="flex flex-col items-center justify-center gap-2 px-4 py-8 bg-white/10 hover:bg-white/20 rounded-lg shadow-sm">
+            <article className="flex flex-col items-center outline-offset-2 justify-center gap-2 px-4 py-8 bg-white/10 hover:bg-white/20 rounded-lg shadow-sm">
               <div className="text-sm font-medium">
                 {new Date(createdAt).toLocaleDateString()}
               </div>
@@ -53,7 +55,7 @@ function GameList({ games }: { games: Game[] }) {
         ))}
       </div>
       <div className="w-1/2 mx-auto h-px bg-white/20 my-8" />
-      <Link className="self-center rounded-full bg-secondary text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-secondary/80" href="/game/create">
+      <Link className="self-center rounded-full bg-secondary outline-offset-2 text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-secondary/80" href="/game/create">
         Create new game
       </Link>
     </div>
