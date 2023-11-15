@@ -11,8 +11,6 @@ export default async function Home() {
       <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
         Poker <span className="text-secondary">Share</span>
       </h1>
-      <div className="flex self-center w-full">
-      </div>
       {!session && (
         <Link
           href={"/api/auth/signin"}
