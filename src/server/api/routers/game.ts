@@ -10,7 +10,7 @@ export const gameRouter = createTRPCRouter({
           {
             participants: {
               some: {
-                id: ctx.session.user.id,
+                userId: ctx.session.user.id,
               }
             }
           }
