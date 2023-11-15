@@ -32,7 +32,7 @@ export const gameRouter = createTRPCRouter({
 
     if (!game) return null;
 
-    const isParticipant = game.participants.some(p => p.id === ctx.session.user.id);
+    const isParticipant = game.participants.some(p => p.userId === ctx.session.user.id);
     const isCreator = game.createdById === ctx.session.user.id;
 
     if (!isParticipant && !isCreator) return null;
