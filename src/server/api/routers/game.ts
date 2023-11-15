@@ -40,6 +40,29 @@ export const gameRouter = createTRPCRouter({
     return game;
   }),
 
+  startGame: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    return await ctx.db.game.update({
+      where: {
+        id: input
+      },
+      data: {
+        startTime: new Date()
+      }
+    })
+  }),
+
+  endGame: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    return await ctx.db.game.update({
+      where: {
+        id: input
+      },
+      data: {
+        endTime: new Date(),
+        isFinished: true,
+      }
+    })
+  }),
+
   create: protectedProcedure.input(z.object({
     buyIn: z.number(),
     initialStack: z.number(),
