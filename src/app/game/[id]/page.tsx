@@ -7,7 +7,7 @@ import { api } from "~/trpc/react";
 export default function Game() {
 
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = api.game.getGameInfo.useQuery(id);
+  const { data: game, isLoading } = api.game.getGameInfo.useQuery(id);
   const utils = api.useUtils()
 
   const startGame = api.game.startGame.useMutation({
@@ -25,7 +25,7 @@ export default function Game() {
     return <p>Loading...</p>
   }
 
-  const { createdAt, initialStack, buyIn, startTime, endTime, isFinished } = data ?? {};
+  const { createdAt, initialStack, buyIn, startTime, isFinished, createdBy } = game ?? {};
 
   const handleStartGame = (id: string) => {
     startGame.mutate(id)
@@ -44,8 +44,8 @@ export default function Game() {
 
   return (
     <section>
-      <h1 className="text-5xl font-medium">Game - {id}</h1>
-      <div className="flex">
+      <h1 className="text-5xl text-secondary font-semibold">Game</h1>
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-0">
         <div className="flex-1">
           <div className="flex items-center mt-8">
             <h2 className="text-3xl font-medium">Game Info</h2>
@@ -55,6 +55,7 @@ export default function Game() {
             <p>The game was created on {createdAt?.toLocaleDateString()}</p>
             <p>Each player started with: <strong>{initialStack}</strong> chips</p>
             <p>Each player bought in with: <strong>{buyIn}</strong></p>
+            <p>The game was created by: <strong>{createdBy?.name}</strong></p>
           </div>
           {!startTime ? (
             <button disabled={startGame.isLoading} onClick={() => handleStartGame(id)} className="rounded-sm w-full lg:w-2/3 mt-8 bg-secondary outline-offset-2 text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-secondary/80" type="submit">
@@ -68,7 +69,7 @@ export default function Game() {
         </div>
         {(startTime && !isFinished) && (
           <div>
-            <Timer />
+            <Timer gameId={id} />
           </div>
         )}
       </div>
