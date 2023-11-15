@@ -25,7 +25,11 @@ export const gameRouter = createTRPCRouter({
         id: input,
       },
       include: {
-        createdBy: true,
+        createdBy: {
+          select: {
+            name: true
+          }
+        },
         participants: true,
       },
     });
