@@ -27,9 +27,8 @@ export default function Game() {
 
   const { createdAt, initialStack, buyIn, startTime, isFinished, createdBy } = game ?? {};
 
-  const handleStartGame = (id: string) => {
-    startGame.mutate(id)
-  }
+  const handleStartGame = (id: string) => startGame.mutate(id)
+
   const handleEndGame = (id: string) => endGame.mutate(id)
 
   const stateOfTheGame = () => {
@@ -57,11 +56,12 @@ export default function Game() {
             <p>Each player bought in with: <strong>{buyIn}</strong></p>
             <p>The game was created by: <strong>{createdBy?.name}</strong></p>
           </div>
-          {!startTime ? (
+          {!startTime && !isFinished && (
             <button disabled={startGame.isLoading} onClick={() => handleStartGame(id)} className="rounded-sm w-full lg:w-2/3 mt-8 bg-secondary outline-offset-2 text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-secondary/80" type="submit">
               Start game
             </button>
-          ) : (
+          )}
+          {!isFinished && startTime && (
             <button disabled={endGame.isLoading} onClick={() => handleEndGame(id)} className="rounded-sm w-full lg:w-2/3 mt-8 bg-gray-300 outline-offset-2 text-black px-10 py-3 shadow-sm font-semibold no-underline hover:bg-gray-400" type="submit">
               End game
             </button>
