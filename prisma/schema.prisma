@@ -72,6 +72,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   games         Game[]
+  gamesWon      Int       @default(0)
 
   participants Participant[]
 }
