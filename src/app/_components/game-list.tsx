@@ -27,7 +27,7 @@ export default function Games() {
 
   return (
     <>
-      <input onChange={(e) => setSearchQuery(e.target.value)} type="search" value={searchQuery} placeholder="Filter your games based on date" className="flex w-full outline-offset-2 text-center rounded-full bg-white/10 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" />
+      <input onChange={(e) => setSearchQuery(e.target.value)} type="search" value={searchQuery} placeholder="Filter your games based on date" className="flex w-full lg:my-4 lg:w-2/3 outline-offset-2 text-center rounded-full bg-white/10 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" />
       {isLoading ? (
         <div>Loading...</div>
       ) : (
