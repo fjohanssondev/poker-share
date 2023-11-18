@@ -85,6 +85,7 @@ export const gameRouter = createTRPCRouter({
           create: input.participants.map(p => ({
             user: p.userId ? { connect: { id: p.userId } } : undefined,
             name: p.name,
+            stack: input.initialStack,
             isRegisteredUser: p.isRegisteredUser
           })),
         },
