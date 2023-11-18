@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerAuthSession } from "~/server/auth";
-import Games from "./_components/game-list";
+import Games from "~/components/game/game-list";
 
 export default async function Home() {
 
