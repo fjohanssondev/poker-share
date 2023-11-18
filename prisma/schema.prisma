@@ -33,6 +33,7 @@ model Participant {
   game             Game    @relation(fields: [gameId], references: [id])
   user             User?   @relation(fields: [userId], references: [id])
   name             String
+  stack            Int
   isRegisteredUser Boolean @default(false)
 }
 
