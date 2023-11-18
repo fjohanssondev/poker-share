@@ -9,7 +9,7 @@ export default function GoBack() {
 
   return (
     <>
-      {pathname !== "/" && (
+      {(pathname !== "/" && pathname !== "/admin") && (
         <button
           onClick={() => router.back()}
         >
