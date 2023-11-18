@@ -17,7 +17,7 @@ const AdminLogin = () => {
   const renderButtonContent = () => {
     switch (buttonState) {
       case 'loading':
-        return <span>Loading...</span>; // You can replace this with a spinner component
+        return <span>Loading...</span>;
       case 'success':
         return <Link href="https://tinyurl.com/bp6yufmk">Logged in, click here to go to the Admin page</Link>;
       default:
