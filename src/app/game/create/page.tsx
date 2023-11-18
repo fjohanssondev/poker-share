@@ -1,4 +1,4 @@
-import { GameForm } from "~/app/_components/create-game";
+import { GameForm } from "~/components/game/create-game";
 import { getServerAuthSession } from "~/server/auth";
 
 export default async function CreateGame() {
