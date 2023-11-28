@@ -55,17 +55,33 @@ export const gameRouter = createTRPCRouter({
     })
   }),
 
-  endGame: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
-    return await ctx.db.game.update({
-      where: {
-        id: input
-      },
-      data: {
-        endTime: new Date(),
-        isFinished: true,
-      }
-    })
-  }),
+  endGame: protectedProcedure.input(z.object({
+    gameId: z.string(), players: z.array(z.object({
+      userId: z.string().optional(),
+      stack: z.number(),
+    }))
+  }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.game.update({
+        where: {
+          id: input.gameId
+        },
+        data: {
+          endTime: new Date(),
+          isFinished: true,
+          participants: {
+            updateMany: input.players.map(p => ({
+              where: {
+                userId: p.userId
+              },
+              data: {
+                stack: p.stack
+              }
+            }))
+          }
+        }
+      })
+    }),
 
   create: protectedProcedure.input(z.object({
     buyIn: z.number(),
@@ -85,7 +101,7 @@ export const gameRouter = createTRPCRouter({
           create: input.participants.map(p => ({
             user: p.userId ? { connect: { id: p.userId } } : undefined,
             name: p.name,
-            stack: input.initialStack,
+            stack: 0,
             isRegisteredUser: p.isRegisteredUser
           })),
         },

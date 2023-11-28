@@ -1,11 +1,12 @@
 "use client"
 
+import React, { useEffect, useState } from "react";
 import type { Participant } from "@prisma/client";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import Timer from "~/app/_components/timer";
-import { stateOfTheGame } from "~/lib/state-of-the-game";
 import { api } from "~/trpc/react";
+import { stateOfTheGame } from "~/lib/state-of-the-game";
+import Timer from "~/app/_components/timer";
+import { Results } from "~/app/_components/game/results";
 
 export default function Game() {
 
@@ -16,16 +17,17 @@ export default function Game() {
   const [players, setPlayers] = useState<Participant[]>([])
 
   useEffect(() => {
-    if (game) {
-      setPlayers(game.participants)
+    if (!isLoading && game?.participants) {
+      setPlayers(game?.participants)
     }
-  }, [game])
+  }, [isLoading, game?.participants])
 
   const startGame = api.game.startGame.useMutation({
     onSuccess: async () => {
       await utils.game.getGameInfo.invalidate()
     }
   });
+
   const endGame = api.game.endGame.useMutation({
     onSuccess: async () => {
       await utils.game.getGameInfo.invalidate()
@@ -41,13 +43,32 @@ export default function Game() {
   const { createdAt, initialStack, buyIn, startTime, isFinished, createdBy } = game ?? {};
 
   const handleStartGame = (id: string) => startGame.mutate(id)
+
   const handleEndGame = (id: string) => {
     const checkStackAddsUp = players.reduce((acc, curr) => acc + Number(curr.stack), 0)
-    if (checkStackAddsUp !== initialStack! * players.length) {
+    if (checkStackAddsUp !== initialStack) {
       return alert("The stacks don't add up to the initial stack")
     }
-    endGame.mutate(id)
+
+    const playerData = players.map((player) => {
+      return {
+        userId: player.userId ?? undefined,
+        stack: player.stack
+      }
+    })
+
+    endGame.mutate({ gameId: id, players: playerData })
   }
+
+  const handleChangePlayerStackValue = (e: React.ChangeEvent<HTMLInputElement>, playerId: string) => {
+    const updatedValue = e.target.value;
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.id === playerId ? { ...player, stack: Number(updatedValue) } : player
+      )
+    );
+  };
+
   const gameState = stateOfTheGame(isFinished, startTime)
 
   return (
@@ -61,9 +82,9 @@ export default function Game() {
           </div>
           <ul className="mt-4">
             <li>The game was created on {createdAt?.toLocaleDateString()}</li>
-            <li>Each player started with: <strong>{initialStack}</strong> chips</li>
-            <li>Each player bought in with: <strong>{buyIn}</strong></li>
-            <li>The game was created by: <strong>{createdBy?.name}</strong></li>
+            <li>Each player started with: <strong className="text-secondary">{initialStack}</strong> chips</li>
+            <li>Each player bought in with: <strong className="text-secondary">{buyIn}</strong></li>
+            <li>The game was created by: <strong className="text-secondary">{createdBy?.name}</strong></li>
           </ul>
           {startTime && !isFinished && (
             <>
@@ -72,7 +93,7 @@ export default function Game() {
                 {players.map((participant) => (
                   <li key={participant.id}>
                     <label className="flex items-center mb-2">{participant.name}</label>
-                      <input onChange={(e) => setPlayers(prev => prev.map(player => player.userId === participant.userId ? { ...player, stack: Number(e.target.value) } : player))} type="number" className="rounded-sm w-2/3 bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" placeholder={`Enter the amount ${participant.name} ended with`} />
+                    <input onChange={(e) => handleChangePlayerStackValue(e, participant.id)} type="number" className="rounded-sm w-2/3 bg-white/10 outline-offset-2 px-4 py-3 font-regular shadow-sm no-underline hover:bg-white/20" placeholder={`Enter the amount ${participant.name} ended with`} />
                   </li>
                 ))}
               </ul>
@@ -95,6 +116,11 @@ export default function Game() {
           </div>
         )}
       </div>
+      {isFinished && (
+        <div className="mt-8">
+          <Results gameId={id} />
+        </div>
+      )}
     </section>
   )
 }

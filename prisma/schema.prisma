@@ -30,7 +30,7 @@ model Participant {
   id               String  @id @default(cuid())
   gameId           String
   userId           String?
-  game             Game    @relation(fields: [gameId], references: [id])
+  game             Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
   user             User?   @relation(fields: [userId], references: [id])
   name             String
   stack            Int
